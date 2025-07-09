@@ -1,0 +1,189 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fascia Healing Journey</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+    }
+    .hero-section {
+      background-image: url('https://source.unsplash.com/random/1920x1080/?wellness,therapy');
+      background-size: cover;
+      background-position: center;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      position: relative;
+    }
+    .hero-overlay {
+      background: rgba(0, 0, 0, 0.4);
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+    .animate-slide-up {
+      animation: slideUp 1s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .smooth-scroll {
+      scroll-behavior: smooth;
+    }
+    .navbar {
+      transition: background-color 0.3s ease;
+    }
+    .navbar.scrolled {
+      background-color: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .navbar.scrolled a {
+      color: #1f2937;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900 smooth-scroll">
+  <!-- Navbar -->
+  <nav class="navbar fixed top-0 left-0 w-full z-20 bg-transparent">
+    <div class="container mx-auto px-6 md:px-12 py-4 flex justify-between items-center">
+      <a href="#home" class="text-2xl font-light text-white">Fascia Healing Journey</a>
+      <ul class="flex space-x-6">
+        <li><a href="#home" class="text-white hover:text-gray-300 transition">Home</a></li>
+        <li><a href="#about" class="text-white hover:text-gray-300 transition">About</a></li>
+        <li><a href="#services" class="text-white hover:text-gray-300 transition">Services</a></li>
+        <li><a href="#contact" class="text-white hover:text-gray-300 transition">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero-section relative">
+    <div class="hero-overlay"></div>
+    <div class="relative z-10 animate-slide-up">
+      <h1 class="text-5xl md:text-7xl font-light mb-4">Teaching you how to heal your body</h1>
+      <p class="text-xl md:text-2xl font-light mb-6">Restore your body's natural balance </br> with my method based on 15 years of research and practice.</p>
+      <a href="#about" class="bg-white text-gray-900 px-6 py-3 rounded-full text-lg font-medium hover:bg-gray-200 transition">Discover More</a>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="py-20 bg-white">
+    <div class="container mx-auto px-6 md:px-12">
+      <h2 class="text-4xl font-light text-center mb-10">What is Fasciatherapy?</h2>
+      <p class="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+        Fasciatherapy is a gentle, hands-on therapy that targets the fascia—the connective tissue that surrounds and supports every structure in your body. By releasing tension and restoring mobility, we help you move freely, reduce pain, and enhance overall well-being.
+      </p>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services" class="py-20 bg-gray-50">
+    <div class="container mx-auto px-6 md:px-12">
+      <h2 class="text-4xl font-light text-center mb-10">Our Services</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition">
+          <h3 class="text-2xl font-light mb-4">Individual Sessions</h3>
+          <p class="text-gray-600">Personalized therapy sessions tailored to your unique needs, focusing on pain relief and mobility.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition">
+          <h3 class="text-2xl font-light mb-4">Group Workshops</h3>
+          <p class="text-gray-600">Join our workshops to learn self-care techniques and improve your body's resilience.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition">
+          <h3 class="text-2xl font-light mb-4">Corporate Wellness</h3>
+          <p class="text-gray-600">Enhance workplace well-being with tailored programs for stress reduction and posture improvement.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-20 bg-white">
+    <div class="container mx-auto px-6 md:px-12 text-center">
+      <h2 class="text-4xl font-light mb-10">Get in Touch</h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
+        Ready to experience the benefits of fasciatherapy? Contact us to schedule a session or learn more.
+      </p>
+      <a href="mailto:info@fasciatherapy.com" class="bg-gray-900 text-white px-6 py-3 rounded-full text-lg font-medium hover:bg-gray-800 transition">Contact Us</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white py-10">
+    <div class="container mx-auto px-6 md:px-12 text-center">
+      <p class="text-lg font-light">FasciaTherapy © 2025. All rights reserved.</p>
+      <p class="text-sm mt-2"><a href="mailto:info@fasciatherapy.com" class="hover:underline">info@fasciatherapy.com</a></p>
+    </div>
+  </footer>
+
+  <script>
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+
+    // Navbar background change on scroll
+    const navbar = document.querySelector('.navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+  </script>
+</body>
+</html>
